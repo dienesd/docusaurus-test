@@ -3,33 +3,41 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main # Vagy master, attól függően, hogy nevezted el a fő branched
-  workflow_dispatch: # Manuális indítás engedélyezése
-    # Review gh actions docs if you want to further define triggers, paths, etc
-    # [https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on)
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
     name: Build Docusaurus
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: npm
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
-      # Adjuk hozzá ezt a lépést, hogy az API specifikáció is felépüljön.
-      - name: Build API Docs
-        run: npm run docusaurus gen-api-docs all
+
+      # Optional – ha van külön generátorod az API dokumentációhoz
+      - name: Build API Docs (optional)
+        run: |
+          if npm run | grep -q 'gen-api-docs'; then
+            npm run docusaurus gen-api-docs all
+          else
+            echo "No API docs generation configured"
+          fi
+
       - name: Build website
         run: npm run build
 
-      - name: Upload Build Artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: build
@@ -37,18 +45,16 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: build
+    runs-on: ubuntu-latest
 
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
+      pages: write
+      id-token: write
 
-    # Deploy to the github-pages environment
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
-    runs-on: ubuntu-latest
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
