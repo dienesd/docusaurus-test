@@ -1,0 +1,35 @@
+name: Test Docusaurus Build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+      - name: Build API docs
+        run: npm run docusaurus gen-api-docs all
+      - name: Build
+        run: npm run build
+
+      - name: Check generated API docs
+        run: |
+          if [ ! -s docs/petstore/sidebar.ts ]; then
+            echo "Sidebar not generated!"
+            exit 1
+          fi
+          if ! ls docs/petstore/*.mdx &>/dev/null; then
+            echo "No markdown files generated for API docs!"
+            exit 1
+          fi
