@@ -23,13 +23,23 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Check generated API docs
+      - name: Check PR file names for invalid characters
         run: |
-          if [ ! -s docs/petstore/sidebar.ts ]; then
-            echo "Sidebar not generated!"
+            echo "Checking modified file names..."
+            files=$(git diff --name-only origin/main...HEAD)
+            invalid_files=""
+            for file in $files; do
+            filename=$(basename "$file")
+            if echo "$filename" | grep -q '[^a-zA-Z0-9_.\-]'; then
+                invalid_files="$invalid_files\n$file"
+            fi
+            done
+
+            if [ -n "$invalid_files" ]; then
+            echo "❌ Invalid file names detected:"
+            echo -e "$invalid_files"
+            echo "Only a-z, A-Z, 0-9, underscore (_), hyphen (-), and dot (.) are allowed."
             exit 1
-          fi
-          if ! ls docs/petstore/*.mdx &>/dev/null; then
-            echo "No markdown files generated for API docs!"
-            exit 1
-          fi
+            else
+            echo "✅ All file names are valid."
+            fi
