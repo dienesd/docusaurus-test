@@ -1,5 +1,6 @@
 # Generated API docs
-docs/petstore
+docs/apis
+my-docs-site
 
 # Dependencies
 /node_modules

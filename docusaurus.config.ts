@@ -74,7 +74,7 @@ const config: Config = {
         config: {
           petstore: {  // Egyedi azonosító az API doksinak
             specPath: 'openapi/petstore-api.yaml', // Az OpenAPI fájl elérési útja
-            outputDir: 'docs/petstore', // A generált Markdown fájlok helye
+            outputDir: 'docs/apis/petstore', // A generált Markdown fájlok helye
             sidebarOptions: {
               groupPathsBy: 'tag',  // Csoportosítás tagek alapján az oldalsávban
             },
@@ -106,6 +106,12 @@ const config: Config = {
           to: '/docs/guides/installation-guide',
           label: 'Guides',
           position: 'left'
+        },
+        {
+          type: 'docSidebar',
+          sidebarId: 'apisSidebar',
+          label: 'APIs',
+          position: 'right',
         },
         {
           type: 'docSidebar',
