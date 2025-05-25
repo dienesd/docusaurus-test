@@ -109,15 +109,9 @@ const config: Config = {
         },
         {
           type: 'docSidebar',
-          sidebarId: 'apisSidebar',
-          label: 'APIs',
-          position: 'right',
-        },
-        {
-          type: 'docSidebar',
           sidebarId: 'myApiSidebar',
           label: 'Petstore API',
-          position: 'left',
+          position: 'right',
         },
       ],
     },
