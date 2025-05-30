@@ -25,23 +25,26 @@ jobs:
 
 
     
-      - name: Check PR file names for invalid characters
+      - name: Get list of changed files
         run: |
-            echo "Checking modified file names..."
-            files=$(git diff --name-only origin/main...HEAD)
-            invalid_files=""
-            for file in $files; do
-            filename=$(basename "$file")
-            if echo "$filename" | grep -q '[^a-zA-Z0-9_.\-]'; then
-                invalid_files="$invalid_files\n$file"
-            fi
-            done
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }} > changed_files.txt
+          
 
-            if [ -n "$invalid_files" ]; then
-            echo "❌ Invalid file names detected:"
-            echo -e "$invalid_files"
-            echo "Only a-z, A-Z, 0-9, underscore (_), hyphen (-), and dot (.) are allowed."
-            exit 1
-            else
-            echo "✅ All file names are valid."
+      - name: Check filenames
+        run: |
+          invalid_files=()
+          while IFS= read -r file; do
+            filename=$(basename "$file")
+            if ! [[ "$filename" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+              invalid_files+=("$file")
             fi
+          done < changed_files.txt
+
+          if [ ${#invalid_files[@]} -ne 0 ]; then
+            echo "The following file names contain invalid characters:"
+            for f in "${invalid_files[@]}"; do
+              echo "  - $f"
+            done
+            exit 1
+          fi
