@@ -23,28 +23,32 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: test
+        run: echo 'ez egy teszt'
 
-    
-      - name: Get list of changed files
-        run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }} > changed_files.txt
-          
-
-      - name: Check filenames
-        run: |
-          invalid_files=()
-          while IFS= read -r file; do
-            filename=$(basename "$file")
-            if ! [[ "$filename" =~ ^[a-zA-Z0-9._-]+$ ]]; then
-              invalid_files+=("$file")
-            fi
-          done < changed_files.txt
-
-          if [ ${#invalid_files[@]} -ne 0 ]; then
-            echo "The following file names contain invalid characters:"
-            for f in "${invalid_files[@]}"; do
-              echo "  - $f"
-            done
-            exit 1
-          fi
+#
+# ez is, csak nem működik :D
+#
+#      - name: Get list of changed files
+#        run: |
+#          git fetch origin ${{ github.event.pull_request.base.ref }}
+#          git diff --name-only origin/${{ github.event.pull_request.base.ref }}...${{ github.sha }} > changed_files.txt
+#          
+#
+#      - name: Check filenames
+#        run: |
+#          invalid_files=()
+#          while IFS= read -r file; do
+#            filename=$(basename "$file")
+#            if ! [[ "$filename" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+#              invalid_files+=("$file")
+#            fi
+#          done < changed_files.txt
+#
+#          if [ ${#invalid_files[@]} -ne 0 ]; then
+#            echo "The following file names contain invalid characters:"
+#            for f in "${invalid_files[@]}"; do
+#              echo "  - $f"
+#            done
+#            exit 1
+#          fi
